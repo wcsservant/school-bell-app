@@ -1,21 +1,22 @@
-name: Build School Bell EXE
+name: Build School Bell EXE (32-bit)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "32bit-version" ] # 새로 만든 32비트 브랜치에서만 작동하도록 설정
 
 jobs:
   build:
-    runs-on: windows-latest # -Windows 7 호환성을 위한 구버전- 최신 빌드 환경
+    runs-on: windows-latest
 
     steps:
     - name: 저장소 코드 가져오기
       uses: actions/checkout@v4
 
-    - name: Python 3.8 설정
+    - name: Python 3.8 (32비트) 설정
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8' # Windows 7을 지원하는 파이썬 버전
+        python-version: '3.8'
+        architecture: 'x86' # [핵심] 32비트 파이썬을 설치하여 32비트용 exe를 생성하게 함
 
     - name: 필수 패키지 설치
       run: |
@@ -26,8 +27,8 @@ jobs:
       run: |
         pyinstaller --noconfirm --onefile --windowed main.py
 
-    - name: 빌드된 EXE 파일 업로드
+    - name: 빌드된 32비트 EXE 파일 업로드
       uses: actions/upload-artifact@v4
       with:
-        name: SchoolBell-Win7
+        name: SchoolBell-Win7-32bit # 기존 64비트 파일과 헷갈리지 않게 이름 변경
         path: dist/*.exe
