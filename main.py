@@ -10,7 +10,7 @@ class SchoolBellApp:
     def __init__(self, root):
         self.root = root
         self.root.title("WCS 종소리 프로그램")
-        self.root.geometry("450x550")
+        self.root.geometry("450x650")
         
         # 설정 저장 파일
         self.settings_file = "bell_settings.json"
@@ -32,12 +32,12 @@ class SchoolBellApp:
                     return json.load(f)
             except:
                 pass
-        return {day: [{"start": "", "end": ""} for _ in range(8)] for day in self.days}
+        return {day: [{"start": "", "end": ""} for _ in range(11)] for day in self.days}
 
     def save_settings(self):
         # 현재 화면에 입력된 값을 데이터에 먼저 업데이트
         day = self.current_day_var.get()
-        for i in range(8):
+        for i in range(11):
             self.schedule_data[day][i]["start"] = self.entries[i][0].get()
             self.schedule_data[day][i]["end"] = self.entries[i][1].get()
             
@@ -53,7 +53,7 @@ class SchoolBellApp:
     def update_ui_for_day(self):
         day = self.current_day_var.get()
         day_data = self.schedule_data[day]
-        for i in range(8):
+        for i in range(11):
             self.entries[i][0].delete(0, tk.END)
             self.entries[i][0].insert(0, day_data[i]["start"])
             self.entries[i][1].delete(0, tk.END)
@@ -80,7 +80,7 @@ class SchoolBellApp:
         tk.Label(mid_frame, text="시작벨 (HH:MM)").grid(row=0, column=1, padx=10)
         tk.Label(mid_frame, text="종료벨 (HH:MM)").grid(row=0, column=2, padx=10)
         
-        for i in range(8):
+        for i in range(11):
             tk.Label(mid_frame, text=f"{i+1}교시").grid(row=i+1, column=0, pady=5)
             start_entry = tk.Entry(mid_frame, width=10, justify="center")
             start_entry.grid(row=i+1, column=1, pady=5)
