@@ -2,7 +2,8 @@ name: Build School Bell EXE (32-bit)
 
 on:
   push:
-    branches: [ "32bit-version" ] # 새로 만든 32비트 브랜치에서만 작동하도록 설정
+    branches: [ "32bit-version" ]
+  workflow_dispatch: # Actions 탭에 'Run workflow' 수동 실행 버튼을 만들어 줍니다.
 
 jobs:
   build:
@@ -16,7 +17,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.8'
-        architecture: 'x86' # [핵심] 32비트 파이썬을 설치하여 32비트용 exe를 생성하게 함
+        architecture: 'x86'
 
     - name: 필수 패키지 설치
       run: |
@@ -30,5 +31,5 @@ jobs:
     - name: 빌드된 32비트 EXE 파일 업로드
       uses: actions/upload-artifact@v4
       with:
-        name: SchoolBell-Win7-32bit # 기존 64비트 파일과 헷갈리지 않게 이름 변경
+        name: SchoolBell-Win7-32bit
         path: dist/*.exe
