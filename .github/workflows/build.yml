@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2019 # Windows 7 호환성을 위한 구버전 빌드 환경
+    runs-on: windows-latest # -Windows 7 호환성을 위한 구버전- 최신 빌드 환경
 
     steps:
     - name: 저장소 코드 가져오기
