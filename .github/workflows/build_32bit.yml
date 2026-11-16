@@ -26,7 +26,7 @@ jobs:
 
     - name: 포터블 EXE 빌드
       run: |
-        pyinstaller --noconfirm --onefile --windowed main.py
+        pyinstaller --noconfirm --onefile --windowed --name "SchoolBell" main.py
 
     - name: 빌드된 32비트 EXE 파일 업로드
       uses: actions/upload-artifact@v4
