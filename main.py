@@ -10,7 +10,7 @@ class SchoolBellApp:
     def __init__(self, root):
         self.root = root
         self.root.title("WCS 종소리 프로그램")
-        self.root.geometry("450x650")
+        self.root.geometry("450x730") # 컴포넌트 추가를 위해 세로 길이 확장
         
         # 설정 저장 파일
         self.settings_file = "bell_settings.json"
@@ -59,6 +59,27 @@ class SchoolBellApp:
             self.entries[i][1].delete(0, tk.END)
             self.entries[i][1].insert(0, day_data[i]["end"])
 
+    def import_day_settings(self):
+        target_day = self.copy_day_var.get()
+        
+        if target_day == "선택안함":
+            # 1. 선택안함일 경우: 현재 화면의 1~11교시 값을 모두 빈칸으로 삭제
+            for i in range(11):
+                self.entries[i][0].delete(0, tk.END)
+                self.entries[i][1].delete(0, tk.END)
+            messagebox.showinfo("초기화 완료", "현재 요일의 시간 값이 모두 삭제되었습니다.\n\n※ 아래 '설정 저장' 버튼을 눌러야 완전히 적용됩니다.")
+            
+        else:
+            # 2. 특정 요일일 경우: 해당 요일에 저장되어 있는 값을 현재 화면으로 복사
+            target_data = self.schedule_data[target_day]
+            for i in range(11):
+                self.entries[i][0].delete(0, tk.END)
+                self.entries[i][0].insert(0, target_data[i]["start"])
+                
+                self.entries[i][1].delete(0, tk.END)
+                self.entries[i][1].insert(0, target_data[i]["end"])
+            messagebox.showinfo("가져오기 완료", f"'{target_day}'의 설정값을 화면에 불러왔습니다.\n\n※ 아래 '설정 저장' 버튼을 눌러야 완전히 적용됩니다.")
+
     def build_ui(self):
         # 상단: 요일 선택 및 현재 시간
         top_frame = tk.Frame(self.root)
@@ -87,7 +108,25 @@ class SchoolBellApp:
             end_entry = tk.Entry(mid_frame, width=10, justify="center")
             end_entry.grid(row=i+1, column=2, pady=5)
             self.entries.append((start_entry, end_entry))
-            
+        
+        #가져오기 그룹
+        copy_frame = tk.LabelFrame(self.root, text="다른 요일 값 가져오기", padx=10, pady=10)
+        copy_frame.pack(pady=10, fill="x", padx=30)
+        
+        # 콤보박스에 들어갈 항목 설정
+        self.copy_day_var = tk.StringVar(value="선택안함")
+        copy_options = ["선택안함"] + self.days
+        
+        # 왼쪽: 레이블과 콤보박스
+        left_subframe = tk.Frame(copy_frame)
+        left_subframe.pack(side=tk.LEFT)
+        tk.Label(left_subframe, text="가져올 요일:").pack(side=tk.LEFT, padx=(0, 5))
+        copy_combo = ttk.Combobox(left_subframe, textvariable=self.copy_day_var, values=copy_options, state="readonly", width=10)
+        copy_combo.pack(side=tk.LEFT)
+        
+        # 오른쪽: 가져오기 버튼
+        tk.Button(copy_frame, text="가져오기", command=self.import_day_settings, bg="#f0f0f0").pack(side=tk.RIGHT)
+
         # 하단: 안내 문구 및 저장 버튼
         btn_frame = tk.Frame(self.root)
         btn_frame.pack(pady=10)
@@ -110,9 +149,27 @@ class SchoolBellApp:
             current_hm = now.strftime("%H:%M")
             
             for period in today_schedule:
-                if period["start"] == current_hm:
+                start_val = period["start"].strip()
+                end_val = period["end"].strip()
+                
+                # "9:00", "9:0" 등의 입력을 "09:00" 포맷으로 자동 변환
+                try:
+                    if start_val and ":" in start_val:
+                        h, m = start_val.split(":")
+                        start_val = f"{int(h):02d}:{int(m):02d}"
+                except:
+                    pass
+                
+                try:
+                    if end_val and ":" in end_val:
+                        h, m = end_val.split(":")
+                        end_val = f"{int(h):02d}:{int(m):02d}"
+                except:
+                    pass
+                
+                if start_val == current_hm:
                     self.play_bell("start")
-                elif period["end"] == current_hm:
+                elif end_val == current_hm:
                     self.play_bell("end")
                     
         # 1초(1000ms)마다 시계 갱신
